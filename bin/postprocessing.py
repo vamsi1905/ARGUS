@@ -17,13 +17,13 @@ def postprocessing(cwd=None):
     
     #get files
     if config.get('spider-settings', 'spider') == "text":
-        merged_file = open(config.get('input-data', 'filepath').split(".")[0] +   "_scraped_texts.csv", "w", encoding="utf-8")
+        merged_file = open(config.get('input-data', 'filepath').split(".")[0] + "_scraped_texts.csv", "w", encoding="utf-8")
         output = config.get('input-data', 'filepath').split(".")[0] + "_scraped_texts.csv"
     elif config.get('spider-settings', 'spider') == "link":
-        merged_file = open(config.get('input-data', 'filepath').split(".")[0] +   "_scraped_links.csv", "w", encoding="utf-8")
+        merged_file = open(config.get('input-data', 'filepath').split(".")[0] + "_scraped_links.csv", "w", encoding="utf-8")
         output = config.get('input-data', 'filepath').split(".")[0] + "_scraped_links.csv"
     elif config.get('spider-settings', 'spider') == "webarchive":
-        merged_file = open(config.get('input-data', 'filepath').split(".")[0] +   "_webarchive_scraped_texts.csv", "w", encoding="utf-8")
+        merged_file = open(config.get('input-data', 'filepath').split(".")[0] + "_webarchive_scraped_texts.csv", "w", encoding="utf-8")
         output = config.get('input-data', 'filepath').split(".")[0] + "_webarchive_scraped_texts.csv"
     output_files = [cwd + "\\chunks\\" + f for f in os.listdir(cwd + "\\chunks") if f.split("_")[0] == "output"]
 
@@ -69,6 +69,7 @@ def postprocessing(cwd=None):
             while 1:
                 line = f.readline()
                 if not line:
+                    ### merged_file.write("No HTML content found")      # Wie kann man das einbauen?
                     break
                 merged_file.write(line)
             f.close()
@@ -135,6 +136,7 @@ def postprocessing(cwd=None):
         c=0
         for fn in output_files:
             tick += 1
+
             if tick == int(len_output_files * 0.05):
                 print ("Processed 5 % of files")
             elif tick == int(len_output_files * 0.15):
@@ -148,7 +150,6 @@ def postprocessing(cwd=None):
             elif tick == int(len_output_files):
                 print ("Processed 100 % of files")
             
-            f = open(fn, encoding="utf-8")
             #if first chunk write the column names
             if c == 0:
                 line = f.readline().split("\t")
@@ -201,7 +202,8 @@ def postprocessing(cwd=None):
                 except:
                     errors += 1
                     continue
-            f.close()        
+            f.close()
+                    
     merged_file.close()    
     
     print("Merging done. Skipped {} websites because of formatting errors. Deleting leftovers...".format(errors))

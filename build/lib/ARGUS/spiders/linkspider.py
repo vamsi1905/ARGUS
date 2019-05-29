@@ -25,7 +25,7 @@ class LinkspiderSpider(scrapy.Spider):
     def __init__(self, url_chunk="", limit=5, ID="ID", url_col="url", language="", prefer_short_urls="on", *args, **kwargs):
         super(LinkspiderSpider, self).__init__(*args, **kwargs)
         #loads urls and IDs from text file
-        data = pd.read_csv(url_chunk, delimiter="\t", encoding="utf-8", error_bad_lines=False, engine="python")
+        data = pd.read_csv(url_chunk, delimiter="\t", encoding="utf-8", error_bad_lines=False)
         self.allowed_domains = [url.split("www.")[-1].lower() for url in list(data[url_col])]
         self.start_urls = ["http://" + url.lower() for url in self.allowed_domains]
         self.IDs = [ID for ID in list(data[ID])]
@@ -229,11 +229,9 @@ class LinkspiderSpider(scrapy.Spider):
         urlstack = meta["urlstack"]
         fingerprints = meta["fingerprints"]
         
-        #check whether max number of webpages has been scraped for this website
-        #check whether max number of webpages has been scraped for this website
-        if self.site_limit != 0:
-            if loader.get_collected_values("scrape_counter")[0] >= self.site_limit:
-                del urlstack[:]
+        #check whether max number of websites has been scraped for this website
+        if loader.get_collected_values("scrape_counter")[0] >= self.site_limit:
+            del urlstack[:]
         
         #reorder the urlstack to scrape the most relevant urls first
         urlstack = self.reorderUrlstack(urlstack, self.language, self.prefer_short_urls)

@@ -2,18 +2,23 @@
 
 ### The GUI provides the possibility to change the settings for scraping without having to change the txt-file manually, as well as an easier way of initiating the program.
 ### runs on Python 3.6
-### author: Sebastian Schmidt
-
-
+### author: Jan Kinne, Sebastian Schmidt
 
 
 import os
 import sys
-from tkinter import filedialog
-import tkinter.messagebox
-import tkinter as tk
 import pandas as pd
 import time
+import datetime
+import tkinter as tk
+from tkinter import filedialog
+from tkinter import messagebox
+from tkinter import ttk
+import tkinter.messagebox
+from tkcalendar import Calendar, DateEntry
+from PIL import Image
+from PIL import ImageTk
+
 
 
 
@@ -29,7 +34,7 @@ clear()
 print("""
 ##################################################
 #    _______  ______  ______ _     _ _______     #
-#    |_____| |_____/ |  ____ |     | |____       #
+#    |_____| |_____/ |  ____ |     | |_____      #
 #    |     | |    \_ |_____| |_____| ______|     #
 #                                                #
 # Automated Robot for Generic Universal Scraping #
@@ -209,7 +214,7 @@ e7 = tk.Entry(master)
 
 tkvar7 = tk.StringVar(master)
 tkvar7.set("Select") # set the default option
-spiders = ["text", "link"]
+spiders = ["text", "link", "webarchive"]
 popupMenu7 = tk.OptionMenu(master, tkvar7, *spiders)
 popupMenu7.grid(row=3, column=1, sticky=tk.E)
 popupMenu7.config(font=("Calibri", 12))
@@ -295,6 +300,41 @@ def change_dropdown11(*args):
 
 tkvar11.trace('w', change_dropdown11)
 
+# date
+# the date has to be entered in the order year/month/day
+e12 = tk.Spinbox(master, from_=0, to=1000000000000, validate="key", width=9, font=("Calibri", 12))
+e12.grid(row=8, column=1, sticky=tk.N + tk.E)
+
+def calendar():
+    e12.delete(0, 'end')
+    
+    top = tk.Toplevel(master)
+
+    # select date from calendar
+    def select_date():
+        select_date = str(cal.selection_get()) 
+        # transform the structure to make it readable for the webarchive
+        dates = select_date.replace("-", "")+","
+        e12.insert (tk.END, dates)
+
+    def enter_date():
+        # erase the last comma
+        e12.delete(len(e12.get())-1, 'end')
+        top.destroy()
+
+    # get current date
+    now = datetime.datetime.now()
+
+    # create calendar for date selection
+    cal = Calendar(top,
+                   font="Calibri 12", selectmode='day',
+                   cursor="hand1", year=now.year, month=now.month, day=now.day)  
+    cal.pack(fill="both", expand=True)
+    tk.Button(top, text="Add date", command=select_date).pack()
+    tk.Button(top, text="Close", command=enter_date).pack()
+
+tk.Button(master, text='Choose date', font=("Calibri", 12), command=calendar).grid(row=8, column=1, sticky=tk.W)
+
 
 ##### Start Scraping #####
 
@@ -316,6 +356,7 @@ limit = {}
 prefer_short_urls = {}
 language = {}
 log_level = {}
+date = {}
 """
 
 scrapyd_file = """
@@ -355,7 +396,7 @@ def start_scraping():
     print("Writing settings file...")
     settings_txt = open(r".\bin\settings.txt", "w", encoding="utf-8")
     settings_txt.truncate()
-    settings_txt.write(settings_file.format(e1.get(), e2.get(), e3.get(), e4.get(), e5.get(), e6.get(), e7.get(), e8.get(), e9.get(), e10.get(), e11.get()))
+    settings_txt.write(settings_file.format(e1.get(), e2.get(), e3.get(), e4.get(), e5.get(), e6.get(), e7.get(), e8.get(), e9.get(), e10.get(), e11.get(), e12.get()))
     settings_txt.close()
     scrapyd_txt = open(r"scrapyd.conf", "w", encoding="utf-8")
     scrapyd_txt.truncate()
@@ -373,7 +414,41 @@ tk.Button(master, text='Start Scraping', command=start_scraping, font=("Calibri 
 
 ##### Functions #####
 
-tk.Label(master, text="Functions", font=("Calibri", 16)).grid(row=19, column=0, sticky=tk.N)
+tk.Label(master, text="Functions", font=("Calibri", 16)).grid(row=20, column=0, sticky=tk.N)
+
+
+# open pop-up containing information about ARGUS
+def information_box():
+    lines = [
+    'ARGUS is an easy-to-use web mining tool. The program is based on the Scrapy Python framework and is able to crawl a broad range of different websites. On the websites, ARGUS is able to perform tasks like scraping texts or collecting hyperlinks between websites.',
+    ' ', 'ARGUS scrapes HTML elements in the following order:', 
+    '<p> = paragaph',
+    '<div> = division',
+    '<tr> = table row',
+    '<td> = table data',
+    '<th> = table header',
+    '<font> = font size',
+    '<li> = list item',
+    '<small> = barely emphasized text',
+    '<strong> = strongly emphasized text',
+    '<h1> - <h6> = different types of headers',
+    '<span> = division for styling',
+    '<b> = bold text',
+    '<em> = emphasized text', ' ',
+    'If you want to scrape older versions of your URLs, you can use the webarchive spider based on the Wayback Machine. Please note that you will always be redirected to the next existing date. When using a truncated date, you will be redirect to the average value of the date specified. The precise date can be found in the URL. If you enter 0, the first existing HTML code will be scraped.',
+    'Please not that the websites from the Web Archive are not entirely identical to the original websites.', ' ',
+    'author: Jan Kinne',
+    'years of development: 2018-2019']
+    messagebox.showinfo('Information', "\n".join(lines))
+
+width = 25
+height = 25
+img = Image.open("misc/info.gif")           # source: https://de.wikipedia.org/wiki/Datei:Information_icon.svg
+img = img.resize((width,height), Image.ANTIALIAS)
+image =  ImageTk.PhotoImage(img)
+
+tk.Button(master, image=image, command=information_box, width=25).grid(row=20, column=1, sticky=tk.W + tk.E)
+
 
 
 # stop scraping
@@ -390,7 +465,7 @@ def stop_scraping():
             kill_all_jobs.delete_leftovers(os.getcwd())
         subprocess.run(r"TSKILL scrapyd")
 
-tk.Button(master, text='Stop Scraping', command=stop_scraping, font=("Calibri", 12)).grid(row=21, column=0, sticky=tk.W + tk.E)
+tk.Button(master, text='Stop Scraping', command=stop_scraping, font=("Calibri", 12)).grid(row=22, column=0, sticky=tk.W + tk.E)
 
 
 
@@ -415,7 +490,7 @@ def get_job_id():
     job_id = StringDialog.ask_string("Terminate Job", "Enter job you want to terminate:")
     kill_job(job_id)
 
-tk.Button(master, text='Terminate Job', command=get_job_id, font=("Calibri", 12)).grid(row=22, column=0, sticky=tk.W + tk.E)
+tk.Button(master, text='Terminate Job', command=get_job_id, font=("Calibri", 12)).grid(row=23, column=0, sticky=tk.W + tk.E)
 
 
 # postprocessing
@@ -431,6 +506,9 @@ def start_postprocessing():
     elif config.get('spider-settings', 'spider') == "link":
         fn = config.get('input-data', 'filepath').split(".")[0] + "_scraped_links.csv"
         exists = os.path.isfile(fn)
+    elif config.get('spider-settings', 'spider') == "webarchive":
+        fn = config.get('input-data', 'filepath').split(".")[0] + "_webarchive_scraped_texts.csv"
+        exists = os.path.isfile(fn)
     if exists == True:
         overwrite = tk.messagebox.askyesno("WARNING", "Postprocessing will overwrite file {}!\nContinue?".format(fn))
         if overwrite == False:
@@ -444,7 +522,9 @@ def start_postprocessing():
         subprocess.run(r"TSKILL scrapyd")
         postprocessing.postprocessing(os.getcwd())
 
-tk.Button(master, text='Postprocessing', command=start_postprocessing, font=("Calibri", 12)).grid(row=21, column=1, sticky=tk.W + tk.E)
+
+tk.Button(master, text='Postprocessing', command=start_postprocessing, font=("Calibri", 12)).grid(row=22, column=1, sticky=tk.W + tk.E)
+
 
 
 # aggregate webpage texts
@@ -463,14 +543,7 @@ def start_aggregator(*args):
 
 
 
-tk.Button(master, text='Aggregate Webpage Texts', command=start_aggregator, font=("Calibri", 12)).grid(row=22, column=1, sticky=tk.W + tk.E)
-
-
-
-
-
-
-
+tk.Button(master, text='Aggregate Webpage Texts', command=start_aggregator, font=("Calibri", 12)).grid(row=23, column=1, sticky=tk.W + tk.E)
 
 
 
@@ -482,7 +555,7 @@ def post_process():
 
 ##### Functions #####
 
-tk.Label(master, text="Functions", font=("Calibri", 16)).grid(row=19, column=0, sticky=tk.N)
+tk.Label(master, text="Functions", font=("Calibri", 16)).grid(row=20, column=0, sticky=tk.N)
 
 
 

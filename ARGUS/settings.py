@@ -14,6 +14,8 @@ BOT_NAME = 'ARGUS'
 SPIDER_MODULES = ['ARGUS.spiders']
 NEWSPIDER_MODULE = 'ARGUS.spiders'
 
+REDIRECT_ENABLED = True
+REDIRECT_MAX_TIMES = 2
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36'
@@ -77,7 +79,10 @@ DEFAULT_REQUEST_HEADERS = {
 DOWNLOADER_MIDDLEWARES = {
     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
     'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': None
+    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': None,
+	'scrapy.downloadermiddlewares.redirect.RedirectMiddleware': 500
+
+
 }
 
 # Enable or disable extensions

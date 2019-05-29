@@ -15,9 +15,6 @@ class Collector(scrapy.Item):
     redirect = scrapy.Field()
     scraped_urls = scrapy.Field()
     scraped_text = scrapy.Field()
-    title = scrapy.Field()
-    description = scrapy.Field()
-    keywords = scrapy.Field()
     scrape_counter = scrapy.Field()
     error = scrapy.Field()
     pass
@@ -32,9 +29,6 @@ class Exporter(scrapy.Item):
     text = scrapy.Field()
     error = scrapy.Field()
     dl_rank = scrapy.Field()
-    title = scrapy.Field()
-    description = scrapy.Field()
-    keywords = scrapy.Field()
     pass
 
 class LinkCollector(scrapy.Item):

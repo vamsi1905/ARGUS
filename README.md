@@ -30,6 +30,7 @@ ARGUS works with Python 3.6, is based on the Scrapy framework and has the follow
 *	tldextract
 *	pandas 
 *   pywin32
+*   tkcalendar
 
 Installation of scrapyd requires you to install [C++ Build Tools](https://www.microsoft.com/en-US/download/details.aspx?id=48159) first. Additionally, you need [cURL](https://curl.haxx.se/download.html) to communicate with the ARGUS user interface. An executable Windows 64bit version of cURL can be downloaded [here](https://dl.uxnr.de/build/curl/curl_winssl_msys2_mingw64_stc/curl-7.59.0/curl-7.59.0.zip), for example.
 After downloading and extracting, you need to add a cURL environment variable to your system. See [this Stackoverlow thread](https://stackoverflow.com/questions/9507353/how-do-i-install-set-up-and-use-curl-on-windows) if you do not know how to do that.
@@ -49,15 +50,12 @@ After installing Anaconda, you can use pip to install the packages above by typi
 ### File Settings
 
 -	**Browse** – browse for your file containing website URLs and IDs. The file should be without BOM (byte order mark). An easy way to see whether your text file uses BOM is to use [Notepad++](https://notepad-plus-plus.org/) and check the “Encoding” in the top panel. The URLs need to be in the format “www.example.com”. The directory of your URL list will also be used to output the scraped data. An example website address can be found in /misc:
-
-
-![example url list](https://github.com/datawizard1337/ARGUS/blob/master/misc/pics/url_list.PNG?raw=true)
-
+![example url list](https://github.com/datawizard1337/ARGUS/blob/linkspider/misc/pics/url_list.PNG?raw=true)
 -	**Delimiter** – the type of delimiter your text file uses.
 -	**Encoding** – the encoding of your text file.
 -	**Load Columns** – after defining your file, delimiter, and column, hit this button to load column names.
 -	**ID Column** – the field name of your unique website identifier in your website address file.
--	**URL Column** – the field name of your URLs in your website address file. Make sure there are not empty URL entries (rows) in your data.
+-	**URL Column** – the field name of your URLs in your website address file.
 
 ### Web Scraper Settings
 
@@ -118,9 +116,6 @@ One row equals one webpage and n (n ≤ **Scrape limit**) webpages equal one web
 *	**error** – not “None” if there was an error requesting the website’s main page. Can be an HTML error (e.g., “404”), DNS lookup error, or a timeout.
 *	**redirect** – is “True” if there was a redirect to another domain when requesting the first webpage from a website. This may indicate that ARGUS scraped a different website than intended. However, it may also be a less severe redirect like “www.example.de” to “www.example.com”. It is your responsibility to deal with redirects.
 *	**start_page** – gives you the first webpage that was scraped from this website. Usually, this should be the URL given in your website address file.
-*	**title** – the title of the website as indicated in the website's meta data.
-*	**keywords** – the title of the website as indicated in the website's meta data.
-*	**description** – the title of the website as indicated in the website's meta data.
 *	**text** – the text that was downloaded from the webpage.
 *	**timestamp** – the exact time when the webpage was downloaded.
 *	**url** – the URL of the webpage.
