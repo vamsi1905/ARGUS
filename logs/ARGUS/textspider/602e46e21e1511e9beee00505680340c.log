@@ -1,0 +1,54 @@
+2019-01-22 08:14:39 [scrapy.utils.log] INFO: Scrapy 1.5.1 started (bot: ARGUS)
+2019-01-22 08:14:39 [scrapy.utils.log] INFO: Versions: lxml 4.2.4.0, libxml2 2.9.5, cssselect 1.0.3, parsel 1.5.0, w3lib 1.19.0, Twisted 18.7.0, Python 3.6.4 (v3.6.4:d48eceb, Dec 19 2017, 06:54:40) [MSC v.1900 64 bit (AMD64)], pyOpenSSL 18.0.0 (OpenSSL 1.1.0i  14 Aug 2018), cryptography 2.3.1, Platform Windows-7-6.1.7601-SP1
+2019-01-22 08:14:39 [scrapy.crawler] INFO: Overridden settings: {'AJAXCRAWL_ENABLED': True, 'BOT_NAME': 'ARGUS', 'COMPRESSION_ENABLED': False, 'CONCURRENT_ITEMS': 200, 'CONCURRENT_REQUESTS': 100, 'COOKIES_ENABLED': False, 'DOWNLOAD_MAXSIZE': 10000000, 'DOWNLOAD_TIMEOUT': 20, 'FEED_URI': 'file:///C:/ARGUS-webarchive/ARGUS-webarchive/items/ARGUS/textspider/602e46e21e1511e9beee00505680340c.jl', 'LOG_FILE': 'logs\\ARGUS\\textspider\\602e46e21e1511e9beee00505680340c.log', 'LOG_LEVEL': 'INFO', 'NEWSPIDER_MODULE': 'ARGUS.spiders', 'REACTOR_THREADPOOL_MAXSIZE': 30, 'RETRY_ENABLED': False, 'SPIDER_MODULES': ['ARGUS.spiders']}
+2019-01-22 08:14:39 [py.warnings] WARNING: c:\python36\lib\site-packages\scrapy\utils\deprecate.py:156: ScrapyDeprecationWarning: `scrapy.contrib.feedexport.FeedExporter` class is deprecated, use `scrapy.extensions.feedexport.FeedExporter` instead
+  ScrapyDeprecationWarning)
+
+2019-01-22 08:14:39 [scrapy.middleware] INFO: Enabled extensions:
+['scrapy.extensions.corestats.CoreStats',
+ 'scrapy.extensions.telnet.TelnetConsole',
+ 'scrapy.extensions.logstats.LogStats']
+2019-01-22 08:14:39 [scrapy.middleware] INFO: Enabled downloader middlewares:
+['scrapy.downloadermiddlewares.httpauth.HttpAuthMiddleware',
+ 'scrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware',
+ 'scrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware',
+ 'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware',
+ 'scrapy.downloadermiddlewares.ajaxcrawl.AjaxCrawlMiddleware',
+ 'scrapy.downloadermiddlewares.redirect.MetaRefreshMiddleware',
+ 'scrapy.downloadermiddlewares.redirect.RedirectMiddleware',
+ 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware',
+ 'scrapy.downloadermiddlewares.stats.DownloaderStats']
+2019-01-22 08:14:39 [scrapy.middleware] INFO: Enabled spider middlewares:
+['scrapy.spidermiddlewares.httperror.HttpErrorMiddleware',
+ 'scrapy.spidermiddlewares.offsite.OffsiteMiddleware',
+ 'scrapy.spidermiddlewares.referer.RefererMiddleware',
+ 'scrapy.spidermiddlewares.urllength.UrlLengthMiddleware',
+ 'scrapy.spidermiddlewares.depth.DepthMiddleware']
+2019-01-22 08:14:39 [scrapy.middleware] INFO: Enabled item pipelines:
+['ARGUS.pipelines.TextPipeline']
+2019-01-22 08:14:39 [scrapy.core.engine] INFO: Spider opened
+2019-01-22 08:14:39 [scrapy.extensions.logstats] INFO: Crawled 0 pages (at 0 pages/min), scraped 0 items (at 0 items/min)
+2019-01-22 08:14:47 [scrapy.core.engine] INFO: Closing spider (finished)
+2019-01-22 08:14:47 [scrapy.statscollectors] INFO: Dumping Scrapy stats:
+{'downloader/request_bytes': 9932,
+ 'downloader/request_count': 32,
+ 'downloader/request_method_count/GET': 32,
+ 'downloader/response_bytes': 962656,
+ 'downloader/response_count': 32,
+ 'downloader/response_status_count/200': 25,
+ 'downloader/response_status_count/301': 5,
+ 'downloader/response_status_count/302': 1,
+ 'downloader/response_status_count/404': 1,
+ 'finish_reason': 'finished',
+ 'finish_time': datetime.datetime(2019, 1, 22, 7, 14, 47, 842382),
+ 'item_scraped_count': 1,
+ 'log_count/INFO': 7,
+ 'log_count/WARNING': 1,
+ 'request_depth_max': 29,
+ 'response_received_count': 30,
+ 'scheduler/dequeued': 32,
+ 'scheduler/dequeued/memory': 32,
+ 'scheduler/enqueued': 32,
+ 'scheduler/enqueued/memory': 32,
+ 'start_time': datetime.datetime(2019, 1, 22, 7, 14, 39, 865585)}
+2019-01-22 08:14:47 [scrapy.core.engine] INFO: Spider closed (finished)
