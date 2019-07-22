@@ -227,16 +227,17 @@ class webarchiveSpider(scrapy.Spider):
         response.meta["loader"] = loader
         response.meta["fingerprints"] = fingerprints
 
-        #make a request for the same url in the web archiv
+        #construct web archive URL for current URL
         original_datestack = self.date.split(",")
         current_datestack = original_datestack
-
         date = current_datestack.pop(0)
         archiveurl = 'https://web.archive.org/web/' + date + 'id_/' + response.url
 
-        # get redirected URL
+        #get redirected URL to enable webarchive redirection
         r = requests.get(archiveurl)
         redirected = r.url
+
+        #send request
         yield scrapy.Request(redirected, meta={"loader": loader, "urlstack": urlstack, "current_datestack": current_datestack, "original_datestack": original_datestack, "current_url": archiveurl, "fingerprints": fingerprints, "handle_httpstatus_list" : [302], 'dont_redirect': True}, dont_filter=True, callback=self.parse_archive_subpage, errback=self.processURLstack)
     
 
@@ -250,56 +251,8 @@ class webarchiveSpider(scrapy.Spider):
         if request_fingerprint(response.request) in response.meta["fingerprints"]:
             return self.processURLstack(response)
        
-        
         #save the fingerprint to mark the page as read
         response.meta["fingerprints"].add(request_fingerprint(response.request))
-        
-        # #opt out and fall back to processURLstack
-        # #if http client errors
-        # if response.status > 308:
-        #     print("308")
-        #     return self.processURLstack(response)
-    
-        # #if redirect sent us to an non-allowed domain
-        # elif self.subdomainGetter(response) not in self.allowed_domains:
-        #     print("Not allowed domain")
-        #     return self.processURLstack(response)
-        
-        # #skip broken urls
-        # if response.status == 301:      
-        #     print("301")                   
-        #     #revive the loader from the response meta data
-        #     loader = response.meta["loader"]
-            
-        #     #check whether this request was redirected to an allowed url which is actually another firm
-        #     if loader.get_collected_values("start_domain")[0] != self.subdomainGetter(response):
-        #         raise ValueError()
-
-        #     #extract urls and add them to the urlstack
-        #     urls = response.xpath("//a/@href").extract() + response.xpath("//frame/@src").extract() + response.xpath("//frameset/@src").extract()
-        #     for url in urls:
-        #         response.meta["urlstack"].append(response.urljoin(url))
-                                    
-        #     #pass back the updated urlstack    
-        #     return self.processURLstack(response)
-        
-        # if response.status == 302:           
-        #     print("302")             
-        #     #revive the loader from the response meta data
-        #     loader = response.meta["loader"]
-            
-        #     #check whether this request was redirected to a allowed url which is actually another firm
-        #     if loader.get_collected_values("start_domain")[0] != self.subdomainGetter(response):
-        #         raise ValueError()
-
-        #     #extract urls and add them to the urlstack
-        #     urls = response.xpath("//a/@href").extract() + response.xpath("//frame/@src").extract() + response.xpath("//frameset/@src").extract()
-        #     for url in urls:
-        #         response.meta["urlstack"].append(response.urljoin(url))
-                                    
-        #     #pass back the updated urlstack    
-        #     return self.processURLstack(response)
-
         
         #revive the loader from the response meta data
         loader = response.meta["loader"]
@@ -307,33 +260,23 @@ class webarchiveSpider(scrapy.Spider):
         #check whether this request was redirected to an allowed url which is actually another firm
         if loader.get_collected_values("start_domain")[0] != self.subdomainGetter(response):
             raise ValueError()
-
-        #extract urls and add them to the urlstack
-        # urls = response.xpath("//a/@href").extract() + response.xpath("//frame/@src").extract() + response.xpath("//frameset/@src").extract()
-        # for url in urls:
-        #     response.meta["urlstack"].append(response.urljoin(url))
                 
-        # #add info to collector item
+        #add info to collector item
         loader.replace_value("scrape_counter", loader.get_collected_values("scrape_counter")[0]+1)
         loader.add_value("scraped_urls", [response.urljoin(response.url)])
         loader.add_value("scraped_text", [self.extractText(response)])
 
-        # #extract all urls from the page...
-        # urls = response.xpath("//a/@href").extract() + response.xpath("//frame/@src").extract() + response.xpath("//frameset/@src").extract()
-        # #...and safe them to a urlstack
-        # urlstack = [response.urljoin(url) for url in urls]
-
-        #make a request for the subpages in the web archive
+        #construct web archive URL for subpage
         current_datestack = self.date.split(",")
         date = current_datestack.pop(0)
-
         urlstack = response.meta["urlstack"]
-
         archiveurl = 'https://web.archive.org/web/' + date + 'id_/' + response.url
-        # get redirected URL
+
+        #get redirected URL
         r = requests.get(archiveurl)
         redirected = r.url
 
+        #send request
         yield scrapy.Request(redirected, meta={"loader": loader, "urlstack": urlstack, "current_datestack": current_datestack, "original_datestack": response.meta["original_datestack"], "current_url": archiveurl, "fingerprints": response.meta["fingerprints"], "handle_httpstatus_list" : [302], 'dont_redirect': True}, dont_filter=True, callback=self.parse_archive_subpage, errback=self.processURLstack)
 
     
@@ -341,6 +284,7 @@ class webarchiveSpider(scrapy.Spider):
 ##################################################################
 # PARSE WEB ARCHIVE PAGE
 ##################################################################
+
     #repeat the parse subpage function for the webarchive urls
     def parse_archive_subpage(self, response):
         #check again
@@ -362,17 +306,19 @@ class webarchiveSpider(scrapy.Spider):
         if len(current_datestack) > 0:
             date = current_datestack.pop(0)
 
-            ### splicing necessary as the response current_url is "incorrect" 
+            #splicing necessary as the response current_url is "incorrect" 
             archiveurl = 'https://web.archive.org/web/' + date + 'id_/' + response.meta["current_url"][40:]
 
-            # get redirected URL
+            #get redirected URL
             r = requests.get(archiveurl)
             redirected = r.url
+
+            #make request
             yield scrapy.Request(redirected, meta={"loader": loader, "urlstack": response.meta["urlstack"], "current_datestack": current_datestack, "original_datestack": response.meta["original_datestack"], "current_url": archiveurl,  "fingerprints": response.meta["fingerprints"], "handle_httpstatus_list" : [302], 'dont_redirect': True}, dont_filter=True, callback=self.parse_archive_subpage, errback=self.processURLstack)
 
         #if there are no more dates in the datestack, return to the URL stack to process the next subpage
         else:
-            ### make an "empty" request to bypass error
+            #make an "empty" request to bypass error
             yield scrapy.Request(response.url, meta={"loader": loader, "urlstack": response.meta["urlstack"], "current_datestack": current_datestack, "original_datestack": response.meta["original_datestack"], "fingerprints": response.meta["fingerprints"], "handle_httpstatus_list" : [302], 'dont_redirect': True}, dont_filter=True, callback=self.processURLstack, errback=self.processURLstack)
 
 			
@@ -417,11 +363,11 @@ class webarchiveSpider(scrapy.Spider):
         #errbacks return to processURLstack
         #ALLOW ALL HTTP STATUS: 
         #errors must be caught in the callback function, because middleware caught request break the sequence and collector items get lost
+        
         if len(urlstack) > 0:
-            
             original_datestack = meta["original_datestack"]
-
             url = urlstack.pop(0)
+            
             #make request for the current website
             yield scrapy.Request(url, meta={"loader": loader, "urlstack": urlstack, "fingerprints": fingerprints, "original_datestack": original_datestack,'handle_httpstatus_all': True, 'current_url': url}, dont_filter=True, callback=self.parse_subpage, errback=self.processURLstack)
 
